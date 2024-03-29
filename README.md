@@ -39,7 +39,6 @@ This is early access so it kinda sucks, but hey it works. Feel free to use this 
 Also if you are struggling with BBEG I strongly recommend using
 <h align="center">
     <a class="rainbow-text">Gamer mode</a>
-</h>
-. It significantly increases your gaming performance.
+</h>. It significantly increases your gaming performance.
 
 <link rel="stylesheet" type="text/css" href="static/styles.css">
