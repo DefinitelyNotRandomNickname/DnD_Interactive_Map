@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, width=device-width">
+  <title>Map</title>
+  <link href="/static/styles.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+  <script>
+    var socket = io();
+
+    var offsetX, offsetY, dragging = false;
+    var tokenWidthPercent = parseFloat({{ token_width }}) / 100;
+    var playerToken;
+
+    var mouseX = 0;
+    var mouseY = 0;
+    var startingScrollX = 0;
+    var startingScrollY = 0;
+    var scrolledX = 0;
+    var scrolledY = 0;
+
+    socket.on('update_players', function(args) {
+      players = args[0];
+      token_width = args[1];
+
+      var playerTokens = document.querySelectorAll(".player-token");
+
+      playerTokens.forEach(function(playerToken) {
+        playerToken.parentNode.removeChild(playerToken);
+      });
+
+      for (var player in players) {
+        var position = players[player];
+
+        var newPlayerToken = document.createElement('img');
+        newPlayerToken.className = 'player-token';
+        newPlayerToken.id = player;
+        newPlayerToken.style.height = token_width + '%';
+        newPlayerToken.style.left = position[0] + '%';
+        newPlayerToken.style.top = position[1] + '%';
+        newPlayerToken.src = position[2];
+
+        var map_container = document.querySelector('.map-container');
+        map_container.appendChild(newPlayerToken);
+
+        newPlayerToken.addEventListener('click', handleClick);
+      }
+    });
+
+    socket.on('update_map', function(args) {
+      map_filename = args[0];
+      tokenWidthPercent = parseFloat(args[1]) / 100;
+
+      var playerTokens = document.querySelectorAll(".player-token");
+
+      playerTokens.forEach(function(playerToken) {
+        playerToken.parentNode.removeChild(playerToken);
+      });
+
+      var map_image = document.getElementById("map");
+      var mesh_image = document.getElementById("mesh");
+      var [mesh_display, mesh_filter, mesh_animation] = [mesh_image.style.display, mesh_image.style.filter, mesh_image.style.animation];
+
+      map_image.parentNode.removeChild(map_image);
+
+      var new_map_image = document.createElement("img");
+      new_map_image.className = "map-image";
+      new_map_image.id = "map";
+      new_map_image.src = "static/" + map_filename + '?' + new Date().getTime();
+
+      mesh_image.parentNode.removeChild(mesh);
+
+      var new_mesh_image = document.createElement("img");
+      new_mesh_image.className = "mesh-image";
+      new_mesh_image.id = "mesh";
+      new_mesh_image.src = "static/mesh.png?" + new Date().getTime();
+      new_mesh_image.style.display = mesh_display;
+      new_mesh_image.style.filter = mesh_filter;
+      new_mesh_image.style.animation = mesh_animation;
+
+      var map_container = document.querySelector('.map-container');
+      map_container.appendChild(new_map_image);
+      map_container.appendChild(new_mesh_image);
+
+      var map_selection = document.getElementById("map-selection");
+      map_selection.value = map_filename.split('/').pop();
+    });
+
+    function handleClick(event) {
+      var clickedId = event.target.id;
+      playerToken = document.getElementById(clickedId);
+      console.log()
+
+      if (!dragging) {
+        dragging = true;
+        var rect = playerToken.getBoundingClientRect();
+        var containerRect = document.querySelector('.map-container').getBoundingClientRect();
+        offsetX = event.clientX - rect.left + containerRect.left;
+        offsetY = event.clientY - rect.top + containerRect.top;
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+        startingScrollX = scrolledX;
+        startingScrollY = scrolledY;
+        playerToken.style.cursor = 'grabbing';
+      } else {
+        dragging = false;
+        playerToken.style.cursor = 'pointer';
+
+        var containerWidth = document.querySelector('.map-image').clientWidth;
+        var containerHeight = document.querySelector('.map-image').clientHeight;
+
+        var cellWidth = containerHeight * tokenWidthPercent;
+        var newX = Math.max(0, Math.min(Math.round((event.clientX - offsetX + scrolledX - startingScrollX) / cellWidth) * cellWidth, containerWidth - cellWidth));
+        var newY = Math.max(0, Math.min(Math.round((event.clientY - offsetY + scrolledY - startingScrollY) / cellWidth) * cellWidth, containerHeight - cellWidth));
+
+        playerToken.style.left = newX + 'px';
+        playerToken.style.top = newY + 'px';
+
+        containerWidth = document.querySelector('.map-container').clientWidth;
+        containerHeight = document.querySelector('.map-container').clientHeight;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/update_player_position', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.send('p=' + clickedId + '&x=' + Math.round(newX) + '&y=' + Math.round(newY) + '&max_x=' + containerWidth + '&max_y=' + containerHeight + '&d=False');
+      }
+    }
+
+    function mouseMove(event) {
+      if (dragging) {
+        playerToken.style.left = event.clientX - offsetX + scrolledX - startingScrollX + 'px';
+        playerToken.style.top = event.clientY - offsetY + scrolledY - startingScrollY + 'px';
+        mouseX = event.clientX;
+        mouseY = event.clientY;
+      }
+    }
+
+    function mouseScroll(event) {
+      scrolledX = window.scrollX;
+      scrolledY = window.scrollY;
+      if (dragging) {
+        playerToken.style.left = mouseX - offsetX + scrolledX - startingScrollX + 'px';
+        playerToken.style.top = mouseY - offsetY + scrolledY - startingScrollY + 'px';
+      }
+    }
+
+    function checkDropOnTrash(event) {
+      if (dragging) {
+        var trashElement = document.getElementById("trash");
+        var trashRect = trashElement.getBoundingClientRect();
+
+        if (event.clientX >= trashRect.left && event.clientX <= trashRect.right &&
+            event.clientY >= trashRect.top && event.clientY <= trashRect.bottom) {
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', '/update_player_position', true);
+          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          xhr.send('p=' + playerToken.id + '&x=' + 0 + '&y=' + 0 + '&max_x=' + 0 + '&max_y=' + 0 + '&d=True');
+
+          playerToken.parentNode.removeChild(playerToken);
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+  <div>
+    <input type="checkbox" id="UI-checkbox" name="UI-checkbox" checked />
+    <label class="label-text" style="font-size: 2vh" for="UI-checkbox">UI</label>
+    <script data-purpose="mesh-color-dropdown">
+      var meshColorDropdown = document.getElementById("UI-checkbox");
+  
+      meshColorDropdown.addEventListener("change", function() {
+        var UiElement = document.getElementById("UI-container");
+        if (this.checked) {
+          UiElement.style.display = "block";
+        }
+        else {
+          UiElement.style.display = "none";
+        }
+      });
+    </script>
+  </div>
+  <div class="container">
+    <div class="map-container" style="position: relative;">
+      <img class="map-image" src={{ url_for('static', filename=map_filename) }} id="map">
+      <img class="mesh-image" src="static/mesh.png" id="mesh">
+
+      {% for player, position in players.items() %}
+        <img id="{{ player }}" class="player-token" src={{ position[2] }} style="height:{{ token_width }}%; top:{{ position[1] }}%; left:{{ position[0] }}%;">
+      {% endfor %}
+
+    </div>
+    <script data-purpose="adding-listeners">
+      var clickableElements = document.getElementsByClassName('player-token');
+      for (var i = 0; i < clickableElements.length; i++) {
+        clickableElements[i].addEventListener('click', handleClick);
+      }
+      document.addEventListener('mousemove', mouseMove);
+      document.addEventListener('scroll', mouseScroll);
+      document.addEventListener('mouseup', checkDropOnTrash);
+    </script>
+    <div class="UI" id="UI-container">
+      <div class="container">
+        <button class="btn btn-add-player" id="add_player" type="submit">Add Player</button>
+        <div class="dropdown-container">
+          <img class="dropdown-toggle" src="" alt="Select an image">
+          <div class="dropdown-content" id="imageDropdown"></div>
+        </div>
+        <script data-purpose="filling-dropdown">
+          var avatars = {{ avatars | tojson }};
+          var dropdown_default = document.getElementsByClassName("dropdown-toggle")[0];
+          
+          // Function to populate the dropdown with image options
+          function populateDropdown() {
+            var dropdown = document.getElementById("imageDropdown");
+            dropdown.innerHTML = "";
+          
+            // Add avatar options to the dropdown
+            avatars.forEach(function(avatar) {
+              var option = document.createElement("img");
+              option.src = 'static/avatars/' + avatar;
+              option.alt = 'static/avatars/' + avatar;
+              option.addEventListener("click", function() {
+                handleImageSelection('static/avatars/' + avatar);
+              });
+              dropdown.appendChild(option);
+            });
+            dropdown_default.src = "static/avatars/" + avatars[0];
+          }
+          
+          // Function to handle image selection
+          function handleImageSelection(path) {
+            dropdown_default.src = path;
+          }
+          
+          // Populate the dropdown initially
+          populateDropdown();
+          
+          // Add event listener to toggle dropdown on click
+          document.querySelector('.dropdown-container').addEventListener('click', function() {
+            this.classList.toggle('active');
+          });
+        </script>
+        <script data-purpose="adding-player">
+          const element = document.getElementById("add_player");
+          element.addEventListener("click", function() {
+            const url = new URL(document.getElementsByClassName("dropdown-toggle")[0].src);
+            const imagePath = url.pathname;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/update_player_position', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send('p=new' + '&x=' + 0 + '&y=' + 0 + '&max_x=' + 1 + '&max_y=' + 1 + '&image=' + imagePath + '&d=False');
+          });
+        </script>
+      </div>
+      <div style="padding-top: 2vw;">
+        <label class="label-text" for="mesh-color">Color of mesh:</label>
+        <select class="mesh-color-dropbox" name="color" id="mesh-color">
+          <option value="white">White</option>
+          <option value="black">Black</option>
+          <option value="red">Red</option>
+          <option value="green">Green</option>
+          <option value="blue">Blue</option>
+          <option value="magenta">Magenta</option>
+          <option value="rainbow">Gamer Mode</option>
+          <option value="D:">No Mesh</option>
+        </select>
+        <script data-purpose="mesh-color-dropbox">
+          var meshColorDropdown = document.getElementById("mesh-color");
+
+          meshColorDropdown.addEventListener("change", function(event) {
+            var selectedColor = meshColorDropdown.value;
+            var meshElement = document.getElementById("mesh");
+            switch (selectedColor) {
+              case 'white':
+                meshElement.style.display = "block";
+                meshElement.style.filter = "none";
+                meshElement.style.animation = "none";
+                break;
+              case 'black':
+                meshElement.style.display = "block";
+                meshElement.style.filter = "brightness(0%)";
+                meshElement.style.animation = "none";
+                break;
+              case 'red':
+                meshElement.style.display = "block";
+                meshElement.style.filter = "brightness(50%) sepia(100) saturate(100) hue-rotate(25deg) saturate(10000%)";
+                meshElement.style.animation = "none";
+                break;
+              case 'green':
+                meshElement.style.display = "block";
+                meshElement.style.filter = "brightness(50%) sepia(100) saturate(100) hue-rotate(90deg) saturate(10000%)";
+                meshElement.style.animation = "none";
+                break;
+              case 'blue':
+                meshElement.style.display = "block";
+                meshElement.style.filter = "brightness(50%) sepia(100) saturate(100) hue-rotate(220deg) saturate(10000%)";
+                meshElement.style.animation = "none";
+                break;
+              case 'magenta':
+                meshElement.style.display = "block";
+                meshElement.style.filter = "brightness(50%) sepia(100) saturate(100) hue-rotate(270deg) saturate(10000%)";
+                meshElement.style.animation = "none";
+                break;
+              case 'rainbow':
+                meshElement.style.display = "block";
+                meshElement.style.filter = "none";
+                meshElement.style.animation = "rainbow-animation 1s linear infinite";
+                break;
+              case 'D:':
+                meshElement.style.display = "none";
+                break;
+            }
+          });
+        </script>
+      </div>
+      <div style="padding-top: 2vw;">
+        <label class="label-text" for="map-selection">Selected map:</label>
+        <select class="mesh-color-dropbox" name="map-selection" id="map-selection">
+        </select>
+        <script data-purpose="mesh-color-dropbox">
+          var map_selection = document.getElementById("map-selection");
+
+          var maps = {{ maps | tojson }}
+
+          maps.forEach(function(map) {
+            var option = document.createElement("option");
+            option.value = map;
+            option.textContent = map;
+            map_selection.appendChild(option);
+          });
+          var filename = document.getElementById("map").src.split('/').pop().split('?')[0];
+
+          map_selection.value = filename;
+
+          map_selection.addEventListener("change", function(event) {
+            var selectedMap = map_selection.value;
+
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/update_map', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.send('map=' + selectedMap + '&cells=' + 0);
+          });
+        </script>
+      </div>
+      <div style="padding-top: 2vw;">
+        <label class="label-text" for="mesh-cells">Horizontal cells:</label>
+        <input class="mesh-color-dropbox" type="number" id="mesh-cells" min="0" value="{{ horizontal_cells }}">
+        <script>
+          document.addEventListener("DOMContentLoaded", function() {
+            const numberInput = document.getElementById("mesh-cells");
+        
+            numberInput.addEventListener("change", function() {
+              const inputValue = parseInt(this.value);
+      
+              if (inputValue > 0) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('POST', '/update_map', true);
+                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                xhr.send('map=None' + '&cells=' + inputValue);
+              }
+            });
+          });
+        </script>
+      </div>
+      <div style="padding-top: 2vw;">
+        <img id="trash" class="delete-player" src="static/resources/trashcan.png" alt="Delete"></img>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

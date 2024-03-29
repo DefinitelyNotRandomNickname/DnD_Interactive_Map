@@ -1,0 +1,151 @@
+body, html {
+    background-color: #121212;
+    margin: 0;
+    padding: 0;
+}
+
+#UI-checkbox {
+    height: 2vh;
+    width: 2vh;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+}
+
+.map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: fit-content;
+}
+
+.map-image {
+    width: fit-content;
+    height: auto;
+}
+
+.mesh-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+    width: fit-content;
+    height: auto;
+}
+
+.player-token {
+    position: absolute;
+    z-index: 3;
+    width: auto;
+    cursor: pointer;
+}
+
+.UI {
+    position: relative;
+    flex: 1;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    padding-top: 2vw;
+}
+
+.btn-add-player {
+    background-color: #00c4c4;
+    height: fit-content;
+    width: fit-content;
+    max-width: fit-content;
+    font-family: 'Courier New', monospace;
+    font-size: 1vw;
+    border-radius: 0.8vw;
+    white-space: nowrap;
+    align-self: center;
+    margin-right: 1vw;
+    flex: 1;
+}
+
+.btn-add-player:hover {
+    background-color: #00b8b8;
+}
+
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+    flex: 1;
+}
+
+.dropdown-toggle {
+    cursor: pointer;
+    height: 5vw;
+    width: 5vw;
+    background-color: #1f1f1f;
+    border: solid 2px;
+    border-color: #4b4b4bcb;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: inherit;
+    background-color: #1f1f1f;
+    border: solid 2px;
+    border-color: #4b4b4bcb;
+    z-index: 1;
+    overflow-y: scroll;
+    max-height: 40vw;
+}
+
+.dropdown-content img, .dropdown-toggle img {
+    height: 5vw;
+    width: auto;
+    display: block;
+    cursor: pointer;
+}
+
+.dropdown-container.active .dropdown-content {
+    display: block;
+}
+
+.label-text {
+    font-family: 'Courier New', monospace;
+    font-size: 1vw;
+    color: #ffffff;
+    flex: 1;
+}
+
+.mesh-color-dropbox {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    font-size: 1vw;
+    color: #ffffff;
+    background-color: inherit;
+}
+
+.mesh-color-dropbox:focus {
+    font-family: 'Courier New', monospace;
+    font-size: 1vw;
+    background-color: #1f1f1f;
+}
+
+.delete-player {
+    position: relative;
+    width: 5vw;
+    height: 5vw;
+    background-color: transparent;
+}
+
+.delete-player:hover {
+    cursor: pointer;
+}
+
+@keyframes rainbow-animation {
+    0% {
+        filter: brightness(1%) sepia(1) saturate(100%) hue-rotate(0deg) saturate(2000);
+    }
+    100% {
+        filter: brightness(1%) sepia(1) saturate(100%) hue-rotate(360deg) saturate(2000);
+    }
+}
