@@ -36,4 +36,18 @@ You can disable UI by clicking checkbox at the top of the map. I recommend disab
 
 This is early access so it kinda sucks, but hey it works. Feel free to use this project for your needs. 
 
-Also if you are struggling with BBEG I strongly recommend using `Gamer Mode`. It significantly increases your gaming performance.
+Also if you are struggling with BBEG I strongly recommend using
+<h align="center">
+    <style>
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px #aa0000, 0 0 10px #aa0000, 0 0 20px #aa0000 }
+            50% { text-shadow: 0 0 5px #00aa00, 0 0 10px #00aa00, 0 0 20px #00aa00 }
+            100% { text-shadow: 0 0 5px #0000aa, 0 0 10px #0000aa, 0 0 20px #0000aa }
+        }
+        h {
+            animation: glow 1.5s ease-in-out infinite alternate;
+        }
+    </style>
+    <a style="background: -webkit-linear-gradient(45deg, #ff0000, #ff0000, #00ff00, #0000ff, #0000ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Gamer Mode</a>
+</h>
+. It significantly increases your gaming performance.
