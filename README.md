@@ -35,10 +35,10 @@ You can disable UI by clicking checkbox at the top of the map. I recommend disab
 ## Note
 
 This is early access so it kinda sucks, but hey it works. Feel free to use this project for your needs. 
-
+<link rel="stylesheet" type="text/css" href="https://github.com/DefinitelyNotRandomNickname/DnD_Interactive_Map/blob/main/static/styles.css">
 Also if you are struggling with BBEG I strongly recommend using
 <h align="center">
     <a class="rainbow-text">Gamer mode</a>
 </h>. It significantly increases your gaming performance.
 
-<link rel="stylesheet" type="text/css" href=(https://github.com/DefinitelyNotRandomNickname/DnD_Interactive_Map/blob/main/static/styles.css)>
+
