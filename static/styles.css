@@ -149,12 +149,3 @@ body, html {
         filter: brightness(1%) sepia(1) saturate(100%) hue-rotate(360deg) saturate(2000);
     }
 }
-
-@keyframes glow {
-    0% { text-shadow: 0 0 5px #aa0000, 0 0 10px #aa0000, 0 0 20px #aa0000; }
-    50% { text-shadow: 0 0 5px #00aa00, 0 0 10px #00aa00, 0 0 20px #00aa00; }
-    100% { text-shadow: 0 0 5px #0000aa, 0 0 10px #0000aa, 0 0 20px #0000aa; }
-}
-.rainbow-text {
-    animation: glow 1.5s ease-in-out infinite alternate;
-}
