@@ -4,13 +4,13 @@
 
 This is flask application that starts a web server within WiFi network. The app takes an image and creates interactive map, grid for it, and manages players on the board. Once set up you can connect to this server via browser on other devices. Idea of this app is to enable players to move on the virtual board using their phones, laptops, or w/e.
 
-![](ttps://github.com/DefinitelyNotRandomNickname/DnD_Interactive_map/blob/main/static/resources/app.gif)
+![](https://github.com/DefinitelyNotRandomNickname/DnD_Interactive_map/blob/main/static/resources/app.gif)
 
 ## Setting up the application
 
 You need to install required libraries from `requirements.txt` file using `pip install -r requirements.txt`. Rest is pretty straightforward. Just run the `dnd_map.py` with python. After running the app, you'll see addresses like:
 
-![](ttps://github.com/DefinitelyNotRandomNickname/DnD_Interactive_map/blob/main/static/resources/run_addresses.png)
+![](https://github.com/DefinitelyNotRandomNickname/DnD_Interactive_map/blob/main/static/resources/run_addresses.png)
 
 The first one is localhost, so if you want to connect on a different device you need to use latter. Just connect to the (in my case) `http://192.168.1.11:5000`. You can change the port in python script.
 
