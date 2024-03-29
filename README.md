@@ -41,4 +41,4 @@ Also if you are struggling with BBEG I strongly recommend using
     <a class="rainbow-text">Gamer mode</a>
 </h>. It significantly increases your gaming performance.
 
-<link rel="stylesheet" type="text/css" href="https://github.com/DefinitelyNotRandomNickname/DnD_Interactive_Map/blob/main/static/styles.css)>
+<link rel="stylesheet" type="text/css" href="https://github.com/DefinitelyNotRandomNickname/DnD_Interactive_Map/blob/main/static/styles.css">
