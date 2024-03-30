@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1, width=device-width">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.png') }}">
   <title>Map</title>
   <link href="/static/styles.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
@@ -21,25 +22,23 @@
     var scrolledY = 0;
 
     socket.on('update_players', function(args) {
-      players = args[0];
+      player = args[0];
       token_width = args[1];
 
-      var playerTokens = document.querySelectorAll(".player-token");
+      var playerToken = document.getElementById(player[0]);
 
-      playerTokens.forEach(function(playerToken) {
+      if (playerToken) {
         playerToken.parentNode.removeChild(playerToken);
-      });
+      }
 
-      for (var player in players) {
-        var position = players[player];
-
+      if (player[1] != null) {
         var newPlayerToken = document.createElement('img');
         newPlayerToken.className = 'player-token';
-        newPlayerToken.id = player;
+        newPlayerToken.id = player[0];
         newPlayerToken.style.height = token_width + '%';
-        newPlayerToken.style.left = position[0] + '%';
-        newPlayerToken.style.top = position[1] + '%';
-        newPlayerToken.src = position[2];
+        newPlayerToken.style.left = player[1] + '%';
+        newPlayerToken.style.top = player[2] + '%';
+        newPlayerToken.src = player[3];
 
         var map_container = document.querySelector('.map-container');
         map_container.appendChild(newPlayerToken);
@@ -347,7 +346,7 @@
       </div>
       <div style="padding-top: 2vw;">
         <label class="label-text" for="mesh-cells">Horizontal cells:</label>
-        <input class="mesh-color-dropbox" type="number" id="mesh-cells" min="0" value="{{ horizontal_cells }}">
+        <input class="mesh-color-dropbox" style="width: 5vw;" type="number" id="mesh-cells" min="0" value="{{ horizontal_cells }}">
         <script>
           document.addEventListener("DOMContentLoaded", function() {
             const numberInput = document.getElementById("mesh-cells");

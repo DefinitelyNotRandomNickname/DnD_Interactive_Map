@@ -42,6 +42,7 @@ def update_player_position():
     
     if request.form['d'] == "True":
         del PLAYERS[player]
+        updated_player = [player, None]
     else:
         if player == 'new':
             if len(PLAYERS) > 0:
@@ -60,8 +61,9 @@ def update_player_position():
         max_y = float(request.form['max_y'])
 
         PLAYERS[player] = [(x / max_x) * 100, (y / max_y) * 100, image_path]
+        updated_player = [player, (x / max_x) * 100, (y / max_y) * 100, image_path]
     
-    socketio.emit('update_players', [PLAYERS, TOKEN_WIDTH])
+    socketio.emit('update_players', [updated_player, TOKEN_WIDTH])
     
     return 'OK'
 

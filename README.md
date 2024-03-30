@@ -26,7 +26,7 @@ Grid is created by app the the very start and when amount of cells in the app ha
 
 ### Players
 
-At the start of the app there're 0 players, you can add a new player in the browser. At the top of UI is button for adding players and a dropbox for selecting their token(avatar). Players can move by clicking at the token on the map and clicking again at the position they want to move to. Player can delete token by moving it into the red bin at the bottom of UI. You can add new tokens by dropping some pics into `static/avatars` directory. For now multiple players can't move at the same time (T^T).
+At the start of the app there're 0 players, you can add a new player in the browser. At the top of UI is button for adding players and a dropbox for selecting their token(avatar). Players can move by clicking at the token on the map and clicking again at the position they want to move to. Player can delete token by moving it into the red bin at the bottom of UI. You can add new tokens by dropping some pics into `static/avatars` directory.
 
 ### UI
 
